@@ -2,331 +2,534 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>甘-时钟</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陈梦绷的计算器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 避免全屏时拖动文字，不影响交互 */
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
-
+        
         body {
-            background-color: #000000;
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', 'Roboto', 'Courier New', monospace;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             padding: 20px;
-            position: relative;
-            transition: background 0.2s;
         }
-
-        /* 主容器 - 只有一个时钟 */
-        .clock-container {
-            background: transparent;
+        
+        .container {
             width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-        }
-
-        /* 翻页时钟区域 */
-        .flip-display {
-            background: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            padding: 20px 10px;
-            transition: all 0.2s;
-        }
-
-        /* 单个数字卡片 (翻页风格) */
-        .flip-card {
-            background: #2c2c2c;  /* 比黑色浅的深灰色，有质感 */
-            color: #f0f0f0;
-            width: 100px;
-            height: 130px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5.5rem;
-            font-weight: 700;
-            border-radius: 12px;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: all 0.1s ease;
-            font-family: monospace;
-            letter-spacing: 2px;
-            /* 模拟轻微翻页立体感 */
-            border-bottom: 3px solid #1a1a1a;
-            border-right: 1px solid #3a3a3a;
-        }
-
-        /* 冒号样式 (独立样式，非卡片) */
-        .colon {
-            font-size: 5rem;
-            font-weight: 700;
-            color: #cccccc;
-            background: transparent;
-            width: auto;
-            padding: 0 8px;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            margin-bottom: 10px;
-        }
-
-        /* 右下角全屏按钮 - 默认显示 */
-        .fullscreen-btn {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            background: #1e1e1e;
-            width: 54px;
-            height: 54px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 28px;
-            border: 1px solid #444;
-            color: #ccc;
-            transition: 0.2s;
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+            gap: 30px;
         }
         
-        .fullscreen-btn:hover {
-            background: #3a3a3a;
+        .header {
+            text-align: center;
             color: white;
-            transform: scale(1.03);
+            width: 100%;
         }
-
-        /* 全屏状态时按钮隐藏 */
-        .fullscreen-btn.hide-in-fullscreen {
-            display: none;
+        
+        .main-title {
+            font-size: 4.5rem;
+            font-weight: 700;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            letter-spacing: 5px;
+            background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
         }
-
-        /* 响应式: 小屏幕下卡片宽度缩小 */
-        @media (max-width: 700px) {
-            .flip-card {
-                width: 65px;
-                height: 90px;
+        
+        .main-title::after {
+            content: "";
+            position: absolute;
+            width: 200px;
+            height: 5px;
+            background: linear-gradient(to right, #ffecd2, #fcb69f);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 20px;
+        }
+        
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .display {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: right;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .calculation {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            min-height: 25px;
+            word-break: break-all;
+        }
+        
+        .result {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 15px;
+        }
+        
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 20px 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .number, .decimal {
+            background-color: #f8f9fa;
+        }
+        
+        .number:hover, .decimal:hover {
+            background-color: #e9ecef;
+        }
+        
+        .operator {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .operator:hover {
+            background-color: #e0a800;
+        }
+        
+        .equals {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .equals:hover {
+            background-color: #218838;
+        }
+        
+        .clear, .backspace {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .clear:hover, .backspace:hover {
+            background-color: #c82333;
+        }
+        
+        .zero {
+            grid-column: span 2;
+        }
+        
+        .footer {
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .highlight {
+            color: #ffecd2;
+            font-weight: bold;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .main-title {
                 font-size: 3.5rem;
             }
-            .colon {
-                font-size: 3.5rem;
-                padding: 0 3px;
+            
+            .calculator {
+                padding: 20px;
+            }
+            
+            button {
+                padding: 18px 0;
+                font-size: 1.3rem;
+            }
+            
+            .result {
+                font-size: 2.3rem;
             }
         }
-        @media (max-width: 550px) {
-            .flip-card {
-                width: 52px;
-                height: 74px;
-                font-size: 2.6rem;
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 2.8rem;
             }
-            .colon {
-                font-size: 2.6rem;
+            
+            .subtitle {
+                font-size: 1.2rem;
             }
-        }
-
-        /* 可选的极简水印/装饰，完全不影响主体 */
-        .clock-sub {
-            margin-top: 28px;
-            font-size: 13px;
-            color: #2a2a2a;
-            letter-spacing: 2px;
+            
+            .calculator {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 15px 0;
+                font-size: 1.2rem;
+            }
+            
+            .result {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-
-<div class="clock-container">
-    <!-- 翻页数字展示区 - 仅当前时间 -->
-    <div class="flip-display" id="flipDisplay"></div>
-    <div class="clock-sub"></div>
-</div>
-
-<div class="fullscreen-btn" id="fullscreenBtn">⛶</div>
-
-<script>
-    // ---------- DOM 元素 ----------
-    const flipDisplay = document.getElementById('flipDisplay');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    
-    // 定时器ID
-    let timeInterval = null;
-    
-    // ---------- 辅助函数: 格式化两位数 ----------
-    function pad2(num) {
-        return Math.floor(num).toString().padStart(2, '0');
-    }
-    
-    // ---------- 核心: 渲染翻页卡片 (支持时分秒"HH:MM:SS"格式，将冒号单独处理) ----------
-    function renderFlipDigits(timeString) {
-        // timeString 格式例如 "12:34:56"
-        // 拆成字符数组，保留冒号单独样式
-        const chars = timeString.split('');
-        flipDisplay.innerHTML = '';
-        for (let ch of chars) {
-            if (ch === ':') {
-                const colonSpan = document.createElement('span');
-                colonSpan.className = 'colon';
-                colonSpan.textContent = ':';
-                flipDisplay.appendChild(colonSpan);
-            } else {
-                const card = document.createElement('div');
-                card.className = 'flip-card';
-                card.textContent = ch;
-                flipDisplay.appendChild(card);
-            }
-        }
-    }
-    
-    // ---------- 获取当前时间并更新显示 (精确到时分秒) ----------
-    function updateCurrentTime() {
-        const now = new Date();
-        const hours = pad2(now.getHours());
-        const minutes = pad2(now.getMinutes());
-        const seconds = pad2(now.getSeconds());
-        const timeStr = `${hours}:${minutes}:${seconds}`;
-        renderFlipDigits(timeStr);
-    }
-    
-    // 启动时钟 (每秒刷新)
-    function startClock() {
-        if (timeInterval) {
-            clearInterval(timeInterval);
-        }
-        updateCurrentTime(); // 立即刷新一次避免空白
-        timeInterval = setInterval(updateCurrentTime, 1000);
-    }
-    
-    // ---------- 全屏逻辑 (进入全屏后按钮隐藏，点击任意空白区域退出全屏，退出全屏后按钮重新出现) ----------
-    // 判断当前是否全屏状态 (兼容各浏览器)
-    function isFullscreenActive() {
-        return !!(document.fullscreenElement || 
-                  document.webkitFullscreenElement || 
-                  document.mozFullScreenElement ||
-                  document.msFullscreenElement);
-    }
-    
-    // 进入全屏
-    function enterFullscreen() {
-        const elem = document.documentElement;
-        const requestMethod = elem.requestFullscreen ||
-                              elem.webkitRequestFullscreen ||
-                              elem.mozRequestFullScreen ||
-                              elem.msRequestFullscreen;
-        if (requestMethod) {
-            requestMethod.call(elem);
-        }
-    }
-    
-    // 退出全屏
-    function exitFullscreen() {
-        const exitMethod = document.exitFullscreen ||
-                           document.webkitExitFullscreen ||
-                           document.mozCancelFullScreen ||
-                           document.msExitFullscreen;
-        if (exitMethod) {
-            exitMethod.call(document);
-        }
-    }
-    
-    // 更新全屏按钮的显隐状态 (全屏时隐藏，非全屏时显示)
-    function updateFullscreenButtonVisibility() {
-        if (isFullscreenActive()) {
-            fullscreenBtn.classList.add('hide-in-fullscreen');
-        } else {
-            fullscreenBtn.classList.remove('hide-in-fullscreen');
-        }
-    }
-    
-    // 全局点击退出全屏的处理 (在全屏状态下，任意点击空白区域自动退出)
-    let fullscreenClickHandler = null;
-    
-    function setupFullscreenAutoExit() {
-        // 监听全屏变化事件，动态添加/移除全局点击监听
-        const onFullscreenChange = () => {
-            const full = isFullscreenActive();
-            // 更新按钮显示/隐藏
-            updateFullscreenButtonVisibility();
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">我的</h1>
+            <p class="subtitle">智能科学计算器 - 精确、快速、优雅</p>
+        </div>
+        
+        <div class="calculator">
+            <div class="display">
+                <div class="calculation" id="calculation"></div>
+                <div class="result" id="result">0</div>
+            </div>
             
-            if (full) {
-                // 进入全屏：设置一个全局点击监听，用于退出全屏
-                if (!fullscreenClickHandler) {
-                    fullscreenClickHandler = function(event) {
-                        // 检查是否还在全屏模式中
-                        if (isFullscreenActive()) {
-                            // 重要：为了避免点击全屏按钮时同时触发退出（按钮已经隐藏，但为防止极端情况）
-                            // 另外由于全屏后按钮已经隐藏，用户点击任何空白区域都应退出全屏
-                            // 但是需要避免事件冒泡导致误解，这里直接退出全屏
-                            exitFullscreen();
-                        }
-                    };
-                    // 注意：使用捕获阶段或者冒泡都可以，但为了确保能捕获所有点击，添加到document
-                    document.addEventListener('click', fullscreenClickHandler);
-                    // 触摸设备同样适配
-                    document.addEventListener('touchstart', fullscreenClickHandler);
-                }
-            } else {
-                // 退出全屏：移除全局点击监听
-                if (fullscreenClickHandler) {
-                    document.removeEventListener('click', fullscreenClickHandler);
-                    document.removeEventListener('touchstart', fullscreenClickHandler);
-                    fullscreenClickHandler = null;
-                }
-            }
+            <div class="buttons">
+                <button class="clear" data-action="clear">C</button>
+                <button class="backspace" data-action="backspace">⌫</button>
+                <button class="operator" data-action="percentage">%</button>
+                <button class="operator" data-action="divide">÷</button>
+                
+                <button class="number" data-number="7">7</button>
+                <button class="number" data-number="8">8</button>
+                <button class="number" data-number="9">9</button>
+                <button class="operator" data-action="multiply">×</button>
+                
+                <button class="number" data-number="4">4</button>
+                <button class="number" data-number="5">5</button>
+                <button class="number" data-number="6">6</button>
+                <button class="operator" data-action="subtract">-</button>
+                
+                <button class="number" data-number="1">1</button>
+                <button class="number" data-number="2">2</button>
+                <button class="number" data-number="3">3</button>
+                <button class="operator" data-action="add">+</button>
+                
+                <button class="number zero" data-number="0">0</button>
+                <button class="decimal" data-action="decimal">.</button>
+                <button class="equals" data-action="equals">=</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2027 <span class="highlight">我的计算器</span> | 支持基本运算、百分比计算和连续运算</p>
+            <p>使用键盘数字键和运算符也可进行操作</p>
+        </div>
+    </div>
+
+    <script>
+        // 计算器状态
+        const calculator = {
+            displayValue: '0',
+            firstOperand: null,
+            waitingForSecondOperand: false,
+            operator: null,
+            calculationHistory: ''
         };
-        
-        // 监听各种全屏变化事件
-        document.addEventListener('fullscreenchange', onFullscreenChange);
-        document.addEventListener('webkitfullscreenchange', onFullscreenChange);
-        document.addEventListener('mozfullscreenchange', onFullscreenChange);
-        document.addEventListener('MSFullscreenChange', onFullscreenChange);
-        
-        // 初始化调用一次，确保按钮初始状态正确
-        onFullscreenChange();
-    }
-    
-    // 全屏按钮点击事件：进入全屏
-    function bindFullscreenButton() {
-        if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', (e) => {
-                e.stopPropagation();  // 阻止冒泡，以免触发全屏后的全局退出（但此时还未全屏，无所谓）
-                if (!isFullscreenActive()) {
-                    enterFullscreen();
-                } else {
-                    // 如果已经是全屏状态（理论上按钮隐藏了很难点到，但为了逻辑完整）
-                    exitFullscreen();
+
+        // 更新显示
+        function updateDisplay() {
+            const resultElement = document.getElementById('result');
+            const calculationElement = document.getElementById('calculation');
+            
+            resultElement.textContent = calculator.displayValue;
+            calculationElement.textContent = calculator.calculationHistory;
+        }
+
+        // 输入数字
+        function inputDigit(digit) {
+            const { displayValue, waitingForSecondOperand } = calculator;
+            
+            if (waitingForSecondOperand === true) {
+                calculator.displayValue = digit;
+                calculator.waitingForSecondOperand = false;
+            } else {
+                calculator.displayValue = displayValue === '0' ? digit : displayValue + digit;
+            }
+            
+            updateDisplay();
+        }
+
+        // 输入小数点
+        function inputDecimal() {
+            if (calculator.waitingForSecondOperand === true) {
+                calculator.displayValue = '0.';
+                calculator.waitingForSecondOperand = false;
+                return;
+            }
+            
+            if (!calculator.displayValue.includes('.')) {
+                calculator.displayValue += '.';
+            }
+            
+            updateDisplay();
+        }
+
+        // 处理操作符
+        function handleOperator(nextOperator) {
+            const { firstOperand, displayValue, operator } = calculator;
+            const inputValue = parseFloat(displayValue);
+            
+            // 更新计算历史
+            if (operator && calculator.waitingForSecondOperand) {
+                // 如果已经有一个操作符，并且正在等待第二个操作数，则更新操作
+            calculator.calculationHistory = calculator.calculationHistory.slice(0, -1) + nextOperator;
+            } else {
+                calculator.calculationHistory = `${calculator.calculationHistory} ${displayValue} ${nextOperator}`;
+            }
+            
+            if (firstOperand === null && !isNaN(inputValue)) {
+                calculator.firstOperand = inputValue;
+            } else if (operator) {
+                const result = performCalculation();
+                calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
+                calculator.firstOperand = result;
+            }
+            
+            calculator.waitingForSecondOperand = true;
+            calculator.operator = nextOperator;
+            
+            updateDisplay();
+        }
+
+        // 执行计算
+        function performCalculation() {
+            const { firstOperand, displayValue, operator } = calculator;
+            const inputValue = parseFloat(displayValue);
+            
+            if (isNaN(firstOperand) || isNaN(inputValue)) {
+                return 0;
+            }
+            
+            switch (operator) {
+                case 'add':
+                    return firstOperand + inputValue;
+                case 'subtract':
+                    return firstOperand - inputValue;
+                case 'multiply':
+                    return firstOperand * inputValue;
+                case 'divide':
+                    return firstOperand / inputValue;
+                case 'percentage':
+                    return firstOperand * (inputValue / 100);
+                default:
+                    return inputValue;
+            }
+        }
+
+        // 重置计算器
+        function resetCalculator() {
+            calculator.displayValue = '0';
+            calculator.firstOperand = null;
+            calculator.waitingForSecondOperand = false;
+            calculator.operator = null;
+            calculator.calculationHistory = '';
+            updateDisplay();
+        }
+
+        // 删除最后一个字符
+        function backspace() {
+            if (calculator.displayValue.length > 1) {
+                calculator.displayValue = calculator.displayValue.slice(0, -1);
+            } else {
+                calculator.displayValue = '0';
+            }
+            updateDisplay();
+        }
+
+        // 计算百分比
+        function calculatePercentage() {
+            const currentValue = parseFloat(calculator.displayValue);
+            if (!isNaN(currentValue)) {
+                calculator.displayValue = (currentValue / 100).toString();
+                updateDisplay();
+            }
+        }
+
+        // 处理等号
+        function handleEquals() {
+            if (calculator.operator && !calculator.waitingForSecondOperand) {
+                const result = performCalculation();
+                calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
+                calculator.calculationHistory = `${calculator.calculationHistory} ${calculator.displayValue}`;
+                calculator.firstOperand = null;
+                calculator.waitingForSecondOperand = false;
+                calculator.operator = null;
+                updateDisplay();
+            }
+        }
+
+        // 键盘支持
+        function handleKeydown(event) {
+            const { key } = event;
+            
+            // 数字键
+            if (key >= '0' && key <= '9') {
+                event.preventDefault();
+                inputDigit(key);
+                return;
+            }
+            
+            // 操作符
+            switch (key) {
+                case '+':
+                    event.preventDefault();
+                    handleOperator('add');
+                    break;
+                case '-':
+                    event.preventDefault();
+                    handleOperator('subtract');
+                    break;
+                case '*':
+                case 'x':
+                case 'X':
+                    event.preventDefault();
+                    handleOperator('multiply');
+                    break;
+                case '/':
+                    event.preventDefault();
+                    handleOperator('divide');
+                    break;
+                case '.':
+                case ',':
+                    event.preventDefault();
+                    inputDecimal();
+                    break;
+                case 'Enter':
+                case '=':
+                    event.preventDefault();
+                    handleEquals();
+                    break;
+                case 'Escape':
+                case 'Delete':
+                    event.preventDefault();
+                    resetCalculator();
+                    break;
+                case 'Backspace':
+                    event.preventDefault();
+                    backspace();
+                    break;
+                case '%':
+                    event.preventDefault();
+                    calculatePercentage();
+                    break;
+            }
+        }
+
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 按钮点击事件
+            document.querySelector('.buttons').addEventListener('click', event => {
+                const { target } = event;
+                
+                if (!target.matches('button')) {
+                    return;
+                }
+                
+                if (target.hasAttribute('data-number')) {
+                    inputDigit(target.getAttribute('data-number'));
+                    return;
+                }
+                
+                if (target.hasAttribute('data-action')) {
+                    const action = target.getAttribute('data-action');
+                    
+                    switch (action) {
+                        case 'decimal':
+                            inputDecimal();
+                            break;
+                        case 'clear':
+                            resetCalculator();
+                            break;
+                        case 'backspace':
+                            backspace();
+                            break;
+                        case 'percentage':
+                            calculatePercentage();
+                            break;
+                        case 'equals':
+                            handleEquals();
+                            break;
+                        case 'add':
+                        case 'subtract':
+                        case 'multiply':
+                        case 'divide':
+                            handleOperator(action);
+                            break;
+                    }
                 }
             });
+            
+            // 键盘事件
+            document.addEventListener('keydown', handleKeydown);
         }
-    }
-    
-    // 可选：键盘ESC退出全屏时，按钮会通过fullscreenchange事件自动处理
-    // 此外确保窗口大小变化也不影响
-    
-    // ---------- 初始化 ----------
-    function init() {
-        startClock();                // 启动时钟
-        bindFullscreenButton();      // 绑定全屏按钮点击
-        setupFullscreenAutoExit();   // 设置全屏状态变化及自动退出全屏监听（点击空白区域退出全屏）
-        
-        // 额外安全处理：若全屏状态下点击页面任何地方退出全屏，已在setupFullscreenAutoExit中通过监听click完成。
-        // 避免多次重复绑定，确保优雅。
-    }
-    
-    // 启动应用
-    init();
-</script>
+
+        // 初始化计算器
+        function initCalculator() {
+            updateDisplay();
+            initEventListeners();
+        }
+
+        // 页面加载完成后初始化计算器
+        document.addEventListener('DOMContentLoaded', initCalculator);
+    </script>
 </body>
 </html>
